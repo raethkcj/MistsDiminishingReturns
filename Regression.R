@@ -6,7 +6,9 @@ for (i in seq_len(nrow(classes))) {
   base_agility <- classes[i, "base_agility"]
   base_parry <- classes[i, "base_parry"]
   base_dodge <- classes[i, "base_dodge"]
-  stat_data <- read.csv(paste0(classes[i, "class"], ".csv"), header = TRUE)
+	class <- classes[i, "class"]
+	print(class)
+  stat_data <- read.csv(paste0(class, ".csv"), header = TRUE)
 
   dodge_fit <- nls(
     dodge ~ 1 / (1 / C_d + k / (dodgeFromRatingPreDR + dodgePerAgi * agility))

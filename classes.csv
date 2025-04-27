@@ -1,6 +1,6 @@
 class,base_strength,base_agility,base_parry,base_dodge
 warrior,192,125,3,3
-paladin,169,93
+paladin,169,93,3,3
 monk,85,107,8,3
 hunter,77,200,0,3
 rogue,123,208,3,3
