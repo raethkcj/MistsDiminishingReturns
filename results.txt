@@ -1,0 +1,329 @@
+
+R version 4.4.3 (2025-02-28) -- "Trophy Case"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> classes <- read.csv("classes.csv", header = TRUE)
+> options(digits = 10)
+> 
+> for (i in seq_len(nrow(classes))) {
++   class <- classes[i, "class"]
++   print(class)
++ 
++   base_strength <- classes[i, "base_strength"]
++   base_agility <- classes[i, "base_agility"]
++   base_parry <- classes[i, "base_parry"]
++   base_dodge <- classes[i, "base_dodge"]
++   parry_per_strength <- classes[i, "parry_per_strength"]
++   dodge_per_agi <- classes[i, "dodge_per_agi"]
++ 
++   stat_data <- read.csv(paste0(class, ".csv"), header = TRUE)
++ 
++   tryCatch ({
++     dodge_fit <- nls(
++       dodge ~ 1 / (1 / C_d + k / (dodgeFromRatingPreDR + dodge_per_agi * agility))
++         + base_dodge + base_agility * dodge_per_agi,
++       data = stat_data,
++       start = list(k = 0.9, C_d = 75)
++     )
++     print(summary(dodge_fit))
++   }, error = function(e) {
++     print(paste0("Failed to fit dodge for ", class, ": ", e))
++   })
++ 
++   if (base_parry > 0) {
++     tryCatch ({
++       parry_fit <- nls(
++         parry ~ 1 / (1 / C_p + k / (parryFromRatingPreDR + parry_per_strength * strength))
++           + base_parry + base_strength * parry_per_strength,
++         data = stat_data,
++         start = list(k = 0.9, C_p = 200))
++       print(summary(parry_fit))
++     }, error = function(e) {
++       print(paste0("Failed to fit parry for ", class, ": ", e))
++     })
++   }
++ }
+[1] "warrior"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error    t value   Pr(>|t|)    
+k   9.560002e-01 7.827421e-08 12213476.7 < 2.22e-16 ***
+C_d 9.064281e+01 1.014544e-04   893433.5 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.488876e-07 on 17 degrees of freedom
+
+Number of iterations to convergence: 5 
+Achieved convergence tolerance: 5.447654e-06
+
+
+Formula: parry ~ 1/(1/C_p + k/(parryFromRatingPreDR + parry_per_strength * 
+    strength)) + base_parry + base_strength * parry_per_strength
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   9.560000e-01 5.397343e-08 17712420 < 2.22e-16 ***
+C_p 2.371861e+02 1.361255e-04  1742408 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 8.652875e-07 on 17 degrees of freedom
+
+Number of iterations to convergence: 4 
+Achieved convergence tolerance: 3.120626e-06
+
+[1] "paladin"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   8.860000e-01 1.807820e-08 49009299 < 2.22e-16 ***
+C_d 6.656749e+01 6.477450e-06 10276805 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.38729e-07 on 15 degrees of freedom
+
+Number of iterations to convergence: 4 
+Achieved convergence tolerance: 6.10164e-08
+
+
+Formula: parry ~ 1/(1/C_p + k/(parryFromRatingPreDR + parry_per_strength * 
+    strength)) + base_parry + base_strength * parry_per_strength
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   8.860000e-01 3.886616e-08 22796183 < 2.22e-16 ***
+C_p 2.371860e+02 1.000140e-04  2371528 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.370961e-07 on 15 degrees of freedom
+
+Number of iterations to convergence: 4 
+Achieved convergence tolerance: 1.174042e-07
+
+[1] "monk"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   1.422000e+00 9.716779e-08 14634482 < 2.22e-16 ***
+C_d 5.012562e+02 1.045859e-03   479277 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.896638e-07 on 5 degrees of freedom
+
+Number of iterations to convergence: 9 
+Achieved convergence tolerance: 1.104561e-06
+
+
+Formula: parry ~ 1/(1/C_p + k/(parryFromRatingPreDR + parry_per_strength * 
+    strength)) + base_parry + base_strength * parry_per_strength
+
+Parameters:
+        Estimate   Std. Error   t value   Pr(>|t|)    
+k   1.421994e+00 3.244118e-06 438329.78 < 2.22e-16 ***
+C_p 9.063576e+01 3.413049e-03  26555.66 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 7.652739e-07 on 5 degrees of freedom
+
+Number of iterations to convergence: 6 
+Achieved convergence tolerance: 8.581633e-08
+
+[1] "hunter"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   9.879998e-01 7.976841e-08 12385853 < 2.22e-16 ***
+C_d 1.455602e+02 7.603957e-05  1914269 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.47479e-07 on 3 degrees of freedom
+
+Number of iterations to convergence: 5 
+Achieved convergence tolerance: 4.12486e-06
+
+[1] "rogue"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   9.880001e-01 4.160187e-08 23748934 < 2.22e-16 ***
+C_d 1.455604e+02 2.998281e-05  4854797 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.327038e-07 on 6 degrees of freedom
+
+Number of iterations to convergence: 5 
+Achieved convergence tolerance: 6.10218e-08
+
+
+Formula: parry ~ 1/(1/C_p + k/(parryFromRatingPreDR + parry_per_strength * 
+    strength)) + base_parry + base_strength * parry_per_strength
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   9.879996e-01 2.491031e-08 39662271 < 2.22e-16 ***
+C_p 1.455594e+02 7.006503e-05  2077490 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.812096e-08 on 6 degrees of freedom
+
+Number of iterations to convergence: 5 
+Achieved convergence tolerance: 7.006943e-09
+
+[1] "priest"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error   t value   Pr(>|t|)    
+k   9.830001e-01 7.727190e-09 127213129 < 2.22e-16 ***
+C_d 1.503760e+02 1.756903e-05   8559148  1.365e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.963097e-08 on 2 degrees of freedom
+
+Number of iterations to convergence: 6 
+Achieved convergence tolerance: 1.975877e-08
+
+[1] "deathknight"
+[1] "Failed to fit dodge for deathknight: Error in nls(dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * : step factor 0.000488281 reduced below 'minFactor' of 0.000976562\n"
+
+Formula: parry ~ 1/(1/C_p + k/(parryFromRatingPreDR + parry_per_strength * 
+    strength)) + base_parry + base_strength * parry_per_strength
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   9.559999e-01 6.007904e-08 15912369 < 2.22e-16 ***
+C_p 2.371860e+02 1.320004e-04  1796859 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 6.692093e-07 on 4 degrees of freedom
+
+Number of iterations to convergence: 4 
+Achieved convergence tolerance: 2.929968e-06
+
+[1] "shaman"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   9.880002e-01 4.725961e-08 20905806 < 2.22e-16 ***
+C_d 1.455605e+02 4.211729e-05  3456076 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 5.117185e-07 on 5 degrees of freedom
+
+Number of iterations to convergence: 5 
+Achieved convergence tolerance: 4.535017e-07
+
+
+Formula: parry ~ 1/(1/C_p + k/(parryFromRatingPreDR + parry_per_strength * 
+    strength)) + base_parry + base_strength * parry_per_strength
+
+Parameters:
+        Estimate   Std. Error    t value   Pr(>|t|)    
+k   9.879999e-01 6.145284e-08 16077367.4 < 2.22e-16 ***
+C_p 1.455602e+02 1.727635e-04   842540.5 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.176676e-08 on 5 degrees of freedom
+
+Number of iterations to convergence: 5 
+Achieved convergence tolerance: 6.385707e-08
+
+[1] "mage"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   9.829999e-01 2.421565e-08 40593581 6.0686e-16 ***
+C_d 1.503758e+02 5.369321e-05  2800648 1.2749e-13 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 6.299572e-08 on 2 degrees of freedom
+
+Number of iterations to convergence: 6 
+Achieved convergence tolerance: 1.305532e-08
+
+[1] "warlock"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+k   9.830000e-01 3.282229e-08 29949164 1.1149e-15 ***
+C_d 1.503760e+02 7.432223e-05  2023298 2.4428e-13 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 8.346552e-08 on 2 degrees of freedom
+
+Number of iterations to convergence: 6 
+Achieved convergence tolerance: 9.637161e-08
+
+[1] "druid"
+
+Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
+    agility)) + base_dodge + base_agility * dodge_per_agi
+
+Parameters:
+        Estimate   Std. Error t value   Pr(>|t|)    
+k   1.222000e+00 1.632913e-07 7483560 1.7856e-14 ***
+C_d 1.503761e+02 1.176634e-04 1278020 6.1224e-13 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 8.836831e-07 on 2 degrees of freedom
+
+Number of iterations to convergence: 6 
+Achieved convergence tolerance: 3.997337e-08
+
+> 
