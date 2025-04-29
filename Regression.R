@@ -2,26 +2,32 @@ classes <- read.csv("classes.csv", header = TRUE)
 options(digits = 10)
 
 for (i in seq_len(nrow(classes))) {
+  class <- classes[i, "class"]
+  print(class)
+
   base_strength <- classes[i, "base_strength"]
   base_agility <- classes[i, "base_agility"]
   base_parry <- classes[i, "base_parry"]
   base_dodge <- classes[i, "base_dodge"]
-	class <- classes[i, "class"]
-	print(class)
+  parry_per_strength <- classes[i, "parry_per_strength"]
+  dodge_per_agi <- classes[i, "dodge_per_agi"]
+
   stat_data <- read.csv(paste0(class, ".csv"), header = TRUE)
 
   dodge_fit <- nls(
-    dodge ~ 1 / (1 / C_d + k / (dodgeFromRatingPreDR + dodgePerAgi * agility))
-    + base_dodge + base_agility * dodgePerAgi,
+    dodge ~ 1 / (1 / C_d + k / (dodgeFromRatingPreDR + dodge_per_agi * agility))
+      + base_dodge + base_agility * dodge_per_agi,
     data = stat_data,
-    start = list(k = 0.9, dodgePerAgi = 1.0, C_d = 75)
+    start = list(k = 0.9, C_d = 75)
   )
   print(summary(dodge_fit))
 
-  parry_fit <- nls(
-    parry ~ 1 / (1 / C_p + k / (parryFromRatingPreDR + parryPerStrength * strength))
-	+ base_parry + base_strength * parryPerStrength,
-    data = stat_data,
-    start = list(k = 0.9, parryPerStrength = 1.0, C_p = 200))
-  print(summary(parry_fit))
+  if (base_parry > 0) {
+    parry_fit <- nls(
+      parry ~ 1 / (1 / C_p + k / (parryFromRatingPreDR + parry_per_strength * strength))
+        + base_parry + base_strength * parry_per_strength,
+      data = stat_data,
+      start = list(k = 0.9, C_p = 200))
+    print(summary(parry_fit))
+  }
 }
