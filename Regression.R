@@ -12,6 +12,8 @@ for (i in seq_len(nrow(classes))) {
   parry_per_strength <- classes[i, "parry_per_strength"]
   dodge_per_agi <- classes[i, "dodge_per_agi"]
   k <- classes[i, "k"]
+  base_block <- classes[i, "base_block"]
+  block_per_mastery <- classes[i, "block_per_mastery"]
 
   stat_data <- read.csv(paste0(class, ".csv"), header = TRUE)
 
@@ -37,6 +39,21 @@ for (i in seq_len(nrow(classes))) {
       print(summary(parry_fit))
     }, error = function(e) {
       print(paste0("Failed to fit parry for ", class, ": ", e))
+    })
+  }
+
+  if (base_block > 0) {
+    block_data <- read.csv(paste0(class, "_block.csv"), header = TRUE)
+
+    tryCatch ({
+      block_fit <- nls(
+        block ~ 1 / (1 / C_b + k / (block_per_mastery * mastery))
+          + base_block,
+        data = block_data,
+        start = list(C_b = 200))
+      print(summary(block_fit))
+    }, error = function(e) {
+      print(paste0("Failed to fit block for ", class, ": ", e))
     })
   }
 }

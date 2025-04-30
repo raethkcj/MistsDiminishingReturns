@@ -31,6 +31,8 @@ Type 'q()' to quit R.
 +   parry_per_strength <- classes[i, "parry_per_strength"]
 +   dodge_per_agi <- classes[i, "dodge_per_agi"]
 +   k <- classes[i, "k"]
++   base_block <- classes[i, "base_block"]
++   block_per_mastery <- classes[i, "block_per_mastery"]
 + 
 +   stat_data <- read.csv(paste0(class, ".csv"), header = TRUE)
 + 
@@ -56,6 +58,21 @@ Type 'q()' to quit R.
 +       print(summary(parry_fit))
 +     }, error = function(e) {
 +       print(paste0("Failed to fit parry for ", class, ": ", e))
++     })
++   }
++ 
++   if (base_block > 0) {
++     block_data <- read.csv(paste0(class, "_block.csv"), header = TRUE)
++ 
++     tryCatch ({
++       block_fit <- nls(
++         block ~ 1 / (1 / C_b + k / (block_per_mastery * mastery))
++           + base_block,
++         data = block_data,
++         start = list(C_b = 200))
++       print(summary(block_fit))
++     }, error = function(e) {
++       print(paste0("Failed to fit block for ", class, ": ", e))
 +     })
 +   }
 + }
@@ -90,6 +107,20 @@ Residual standard error: 8.455372e-07 on 18 degrees of freedom
 Number of iterations to convergence: 4 
 Achieved convergence tolerance: 3.345155e-08
 
+
+Formula: block ~ 1/(1/C_b + k/(block_per_mastery * mastery)) + base_block
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+C_b 150.37555414   0.07272572 2067.708 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.002007177 on 25 degrees of freedom
+
+Number of iterations to convergence: 4 
+Achieved convergence tolerance: 2.785692e-06
+
 [1] "paladin"
 
 Formula: dodge ~ 1/(1/C_d + k/(dodgeFromRatingPreDR + dodge_per_agi * 
@@ -120,6 +151,20 @@ Residual standard error: 4.266622e-07 on 16 degrees of freedom
 
 Number of iterations to convergence: 4 
 Achieved convergence tolerance: 9.490648e-08
+
+
+Formula: block ~ 1/(1/C_b + k/(block_per_mastery * mastery)) + base_block
+
+Parameters:
+        Estimate   Std. Error  t value   Pr(>|t|)    
+C_b 150.35470631   0.01458085 10311.79 < 2.22e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.002048039 on 27 degrees of freedom
+
+Number of iterations to convergence: 4 
+Achieved convergence tolerance: 1.499342e-06
 
 [1] "monk"
 
