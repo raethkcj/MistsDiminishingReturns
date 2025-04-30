@@ -47,7 +47,7 @@ for (i in seq_len(nrow(classes))) {
 
     tryCatch ({
       block_fit <- nls(
-        block ~ 1 / (1 / C_b + k / (block_per_mastery * mastery))
+        block ~ 1 / (1 / C_b + k / (round(block_per_mastery * 128 * mastery)/128))
           + base_block,
         data = block_data,
         start = list(C_b = 200))
